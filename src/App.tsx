@@ -147,30 +147,12 @@ class ExcelMappingService {
   }
   
   private parseDate(value: any): string | undefined {
-    if (!value) return undefined;
-    
-    // Si c'est déjà un objet Date
-    if (value instanceof Date) {
-      return value.toISOString().split('T')[0];
-    }
-    
-    // Si c'est une string, essayer de la parser
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      if (trimmed === '') return undefined;
-      
-      // Essayer de créer une date
-      const date = new Date(trimmed);
-      if (!isNaN(date.getTime())) {
-        return date.toISOString().split('T')[0];
-      }
-    }
-    
-    return undefined;
+    const str = String(value).trim();
+    return str === '' ? undefined : str;
   }
   
   private parseString(value: any): string | undefined {
-    if (!value) return undefined;
+    if (value === null || value === undefined) return undefined;
     const str = String(value).trim();
     return str === '' ? undefined : str;
   }
