@@ -1,0 +1,24 @@
+# .bolt/ignore – fichiers exclus de l’analyse par Bolt
+
+# Docs
+README.md
+README_SODATRA.md
+docs/**
+
+# Migrations Supabase
+supabase/migrations/**
+
+# Dépendances / artefacts
+*.lock
+node_modules/**
+.bolt/**
+
+# Assets et build
+public/**
+dist/**
+build/**
+
+# Tests
+test/**
+__tests__/**
+coverage/**
