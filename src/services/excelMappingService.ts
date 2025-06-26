@@ -9,14 +9,6 @@ interface CollectionTypeResult {
   rawValue?: string;
 }
 
-// Interface pour le résultat de détection du type de collection
-interface CollectionTypeResult {
-  type: 'EFFET' | 'CHEQUE' | 'UNKNOWN';
-  effetEcheanceDate: Date | null;
-  chequeNumber: string | null;
-  rawValue?: string;
-}
-
 class ExcelMappingService {
   // Détecte le type de collection (EFFET ou CHEQUE) basé sur la valeur de No.CHq /Bd
   detectCollectionType(noChqBdValue: any): CollectionTypeResult {
@@ -231,95 +223,6 @@ class ExcelMappingService {
   }
   
   private parseDate(value: any): string | undefined {
-    if (!value) return undefined;
-    
-    try {
-      let date: Date;
-      
-      if (value instanceof Date) {
-        date = value;
-      } else if (typeof value === 'number') {
-        // Excel date serial number
-        date = new Date((value - 25569) * 86400 * 1000);
-      } else if (typeof value === 'string') {
-        // ⭐ AMÉLIORATION - Détecter le format français DD/MM/YYYY
-        const trimmedValue = value.trim();
-        
-        // Détection format français DD/MM/YYYY ou DD/MM/YY
-        const frenchDateRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/;
-        const frenchMatch = trimmedValue.match(frenchDateRegex);
-        
-        if (frenchMatch) {
-          const [, day, month, year] = frenchMatch;
-          
-          // Conversion vers le format ISO YYYY-MM-DD
-          let fullYear = parseInt(year);
-          if (fullYear < 100) {
-            // Gérer les années à 2 chiffres (25 -> 2025, 95 -> 1995)
-            fullYear += fullYear < 50 ? 2000 : 1900;
-          }
-          
-          const isoDate = `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-          console.log(`📅 Date française détectée: ${trimmedValue} -> ${isoDate}`);
-          
-          const parsed = new Date(isoDate);
-          if (!isNaN(parsed.getTime())) {
-            date = parsed;
-          } else {
-            throw new Error(`Date française invalide après conversion: ${isoDate}`);
-          }
-        } else {
-          // Essayer le parsing standard pour les autres formats
-          const parsed = new Date(trimmedValue);
-          if (isNaN(parsed.getTime())) {
-            console.warn('⚠️ Date invalide, utilisation de la date du jour:', trimmedValue);
-            return new Date().toISOString().split('T')[0];
-          }
-          date = parsed;
-        }
-      } else {
-        console.warn('⚠️ Format de date non reconnu, utilisation de la date du jour:', value);
-        return new Date().toISOString().split('T')[0];
-      }
-      
-      return date.toISOString().split('T')[0];
-    } catch (error) {
-      console.warn('⚠️ Erreur parsing date, utilisation de la date du jour:', value, error);
-      return new Date().toISOString().split('T')[0];
-    }
-  }
-  
-  private parseNumber(value: any): number | undefined {
-    if (value === null || value === undefined || value === '') {
-      return undefined;
-    }
-    
-    try {
-      if (typeof value === 'number') {
-        // ⭐ ARRONDIR automatiquement pour éviter les erreurs bigint
-        return isNaN(value) ? undefined : Math.round(value);
-      }
-      
-      if (typeof value === 'string') {
-        // Nettoyer la chaîne (espaces, virgules comme séparateurs de milliers)
-        const cleaned = value.replace(/[\s,]/g, '').replace(',', '.');
-        const parsed = parseFloat(cleaned);
-        // ⭐ ARRONDIR automatiquement
-        return isNaN(parsed) ? undefined : Math.round(parsed);
-      }
-      
-      return undefined;
-    } catch (error) {
-      console.warn('⚠️ Erreur parsing nombre (non-bloquant):', value, error);
-      return undefined;
-    }
-  }
-  
-  private parseString(value: any): string | undefined {
-    if (value === null || value === undefined) {
-      return undefined;
-    }
-    
     const str = String(value).trim();
     return str === '' ? undefined : str;
   }
