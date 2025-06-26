@@ -68,7 +68,27 @@ class ExcelMappingService {
     // Vérification si c'est une string numérique
     if (typeof value === 'string') {
       const numericRegex = /^\d+$/;
-    });
+      return numericRegex.test(value);
+    }
+    
+    return false;
+  }
+  
+  private parseDate(value: any): Date | null {
+    try {
+      if (!value) return null;
+      
+      let date: Date;
+      const trimmedValue = String(value).trim();
+      
+      if (typeof trimmedValue === 'string') {
+        // Format français (DD/MM/YYYY ou DD-MM-YYYY)
+        const frenchDateRegex = /^(\d{2})[/-](\d{2})[/-](\d{2,4})$/;
+        const match = trimmedValue.match(frenchDateRegex);
+        
+        if (match) {
+          const [, day, month, year] = match;
+          let fullYear = parseInt(year);
           if (fullYear < 100) {
             // Gérer les années à 2 chiffres (25 -> 2025, 95 -> 1995)
             fullYear += fullYear < 50 ? 2000 : 1900;
