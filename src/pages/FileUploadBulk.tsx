@@ -40,7 +40,6 @@ class ExcelMappingService {
       return undefined;
     }
   }
-  }
 }
 
 export const excelMappingService = new ExcelMappingService();
