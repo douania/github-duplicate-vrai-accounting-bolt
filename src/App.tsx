@@ -1,45 +1,34 @@
-import { CollectionReport } from '@/types/banking';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from '@/components/Layout';
+import Index from '@/pages/Index';
+import Dashboard from '@/pages/Dashboard';
+import FileUpload from '@/pages/FileUpload';
+import FileUploadBulk from '@/pages/FileUploadBulk';
+import QualityControl from '@/pages/QualityControl';
+import Reconciliation from '@/pages/Reconciliation';
+import ConsolidatedDashboard from '@/pages/ConsolidatedDashboard';
+import Alerts from '@/pages/Alerts';
+import NotFound from '@/pages/NotFound';
 
-// Interface pour le résultat de détection du type de collection
-interface CollectionTypeResult {
-  type: 'EFFET' | 'CHEQUE' | 'UNKNOWN';
-  effetEcheanceDate: Date | null;
-  chequeNumber: string | null;
-  rawValue?: string;
+function App() {
+  return (
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/upload" element={<FileUpload />} />
+          <Route path="/upload-bulk" element={<FileUploadBulk />} />
+          <Route path="/quality-control" element={<QualityControl />} />
+          <Route path="/reconciliation" element={<Reconciliation />} />
+          <Route path="/consolidated" element={<ConsolidatedDashboard />} />
+          <Route path="/alerts" element={<Alerts />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Layout>
+    </Router>
+  );
 }
 
-class ExcelMappingService {
-  // Détecte le type de collection (EFFET ou CHEQUE) basé sur la valeur de No.CHq /Bd
-  detectCollectionType(noChqBdValue: any): CollectionTypeResult {
-    if (!noChqBdValue || noChqBdValue === null) {
-      return {
-        type: 'UNKNOWN',
-        effetEcheanceDate: null,
-        chequeNumber: null
-      };
-    }
-    
-    // Détection : DATE = EFFET
-    try {
-      if (typeof value === 'number') {
-        // ⭐ ARRONDIR automatiquement pour éviter les erreurs bigint
-        return isNaN(value) ? undefined : Math.round(value);
-      }
-      
-      if (typeof value === 'string') {
-        // Nettoyer la chaîne (espaces, virgules comme séparateurs de milliers)
-        const cleaned = value.replace(/[\s,]/g, '').replace(',', '.');
-        const parsed = parseFloat(cleaned);
-        // ⭐ ARRONDIR automatiquement
-        return isNaN(parsed) ? undefined : Math.round(parsed);
-      }
-      
-      return undefined;
-    } catch (error) {
-      console.warn('⚠️ Erreur parsing nombre (non-bloquant):', value, error);
-      return undefined;
-    }
-  }
-}
-
-export const excelMappingService = new ExcelMappingService();
+export default App;
